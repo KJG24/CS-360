@@ -20,9 +20,17 @@ struct node {
 
 struct node *stackInit();
 
-void add(char, struct node*);
+void push(char, struct node*);
 
-void delete(struct node *);
+void deleteStack(struct node *);
+
+int length(struct node *);
+
+struct node *getTop(struct node *);
+
+void pop(struct node *);
+
+
 
 void main(int argc, char **argv) {
     char fileName[50];
@@ -48,20 +56,20 @@ void main(int argc, char **argv) {
         for (i = 0; i < 100; i++) {
             //printf("Testing char %c\n", data[i]);
             //if a bracket/paren is found then add to stack
-            if (data[i] == '\n') {
+            if (data[i] == '\n') { //check if a newline is found as the array holds the data from the longest line forever
                 break;
             } else if (data[i] == '{') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             } else if (data[i] == '}') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             } else if (data[i] == '[') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             } else if (data[i] == ']') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             } else if (data[i] == '(') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             } else if (data[i] == ')') {
-                add(data[i], myStack);
+                push(data[i], myStack);
             }
         }
     }
@@ -69,8 +77,115 @@ void main(int argc, char **argv) {
     fclose(fp); //close file after parse is completed
     
     //place logic for determining if the stack is balanced or not
+    struct node *overflow = stackInit(); //second stack to hold values to be compared
+    int isEmpty = length(myStack);
     
-    delete(myStack); //free all memory in the stack
+    /*
+    if (isEmpty == 0) { //indicates that there were no bracket/paren in the file
+        printf("BALANCED");
+    }
+    */
+    
+    while (isEmpty == 1) { //loop while stack isn't empty
+        struct node *myStackTemp = getTop(myStack); //get top of stack
+        
+        //run through cases that will add to overflow stack
+        if (myStackTemp -> bracket == '}') {
+            push(myStackTemp -> bracket, overflow);
+            pop(myStack); //remove node from top of stack
+        } else if (myStackTemp -> bracket == ')') {
+            push(myStackTemp -> bracket, overflow);
+            pop(myStack);
+        } else if (myStackTemp -> bracket == ']') {
+            push(myStackTemp -> bracket, overflow);
+            pop(myStack);
+        }
+        
+        //run through cases that will remove from overflow stack
+        if (myStackTemp -> bracket == '{') { //overflow must have at least one node and match bracket
+            if (overflow -> next != NULL) { //check to see if overflow isn't empty
+                struct node *overflowTemp = getTop(overflow);
+                
+                if (overflowTemp -> bracket == '}') {
+                    pop(overflow);
+                    pop(myStack);
+                } else { //the curly brace should always work when detected
+                    deleteStack(overflow); //free all memory in the stacks
+                    deleteStack(myStack);
+                    printf("UNBALANCED");
+                    return;
+                }
+                
+            } else { //triggers iff you attempt to remove a parenthesis compliment that doesn't exist
+                deleteStack(overflow); //free all memory in the stacks
+                deleteStack(myStack);
+                printf("UNBALANCED");
+                return;
+            }
+            
+        } else if (myStackTemp -> bracket == '(') {
+            if (overflow -> next != NULL) {
+                struct node *overflowTemp = getTop(overflow);
+                
+                if (overflowTemp -> bracket == ')') {
+                    pop(overflow);
+                    pop(myStack);
+                } else if (overflowTemp -> bracket == '}') {
+                    pop(overflow);
+                    pop(myStack);
+                } else {
+                    deleteStack(overflow); //free all memory in the stacks
+                    deleteStack(myStack);
+                    printf("UNBALANCED");
+                    return;
+                }
+                
+            } else {
+                deleteStack(overflow); //free all memory in the stacks
+                deleteStack(myStack);
+                printf("UNBALANCED");
+                return;
+            }
+            
+        } else if (myStackTemp -> bracket == '[') {
+            if (overflow -> next != NULL) {
+                struct node *overflowTemp = getTop(overflow);
+                
+                if (overflowTemp -> bracket == ']') {
+                    pop(overflow);
+                    pop(myStack);
+                    
+                } else if (overflowTemp -> bracket == '}') {
+                    pop(overflow);
+                    pop(myStack);
+                } else {
+                    deleteStack(overflow); //free all memory in the stacks
+                    deleteStack(myStack);
+                    printf("UNBALANCED");
+                    return;
+                }
+                
+            } else {
+                deleteStack(overflow); //free all memory in the stacks
+                deleteStack(myStack);
+                printf("UNBALANCED");
+                return;
+            }
+        }
+        
+        isEmpty = length(myStack); //refresh to see if the stack is empty
+    }
+    
+    isEmpty = length(overflow); //check to see if there are no left over chars
+    
+    if (isEmpty == 0) {
+        printf("BALANCED");
+    } else {
+        printf("UNBALANCED");
+    }
+    
+    deleteStack(overflow); //free all memory in the stacks
+    deleteStack(myStack);
     return;
 }
 
@@ -88,7 +203,7 @@ struct node *stackInit() {
  Return Value: Void
  Description: add a given data to the stack
  */
-void add(char data, struct node *sent) {
+void push(char data, struct node *sent) {
     struct node *temp = sent; //temparary tracking node
     struct node *new = malloc(sizeof(struct node)); //create new node with the given data
     new -> bracket = data;
@@ -103,7 +218,7 @@ void add(char data, struct node *sent) {
     return;
 }
 
-void delete(struct node *sent) {
+void deleteStack(struct node *sent) {
     struct node *temp = sent;
     
     while (sent != NULL) {
@@ -114,3 +229,42 @@ void delete(struct node *sent) {
     
     return;
 }
+
+//returns an int declaring if the stack is empty or not. 0 for empty and 1 for not empty
+int length(struct node *sent) {
+    struct node *temp = sent -> next; //move off sent node
+    
+    if (temp != NULL) { //if this is triggered the stack isn't empty
+        return 1; //indicates stack isn't empty
+    }
+    
+    return 0; //indicates stack is empty
+}
+
+//returns the top of the stack
+struct node *getTop(struct node *sent) {
+    struct node *temp = sent -> next;
+    
+    while (temp -> next != NULL) { //loop until you get to the top of the list
+        temp = temp -> next;
+    }
+    
+    return temp;
+}
+
+//deletes the top node in the given stack
+void pop(struct node *sent) {
+    struct node *next = sent -> next;
+    struct node *previous = sent;
+    
+    while (next -> next != NULL) {
+        previous = next;
+        next = next -> next;
+    }
+    
+    previous -> next = NULL;
+    //printf("Deleted %c\n", next -> bracket);
+    free(next);
+    return;
+}
+
