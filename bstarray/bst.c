@@ -63,33 +63,31 @@ void growTree(BST* bst) {
  */
 int insertValue(BST *bst, int value) {
     int i = 0;
-    int height = (bst -> size + 1) / 2; //find the height of the tree
     
     if (value <= 0) {
         return -1;
     }
-
-    int insertHeight = 1; //holds the current height that we are inserting at
     
     while (i < bst -> size) {
-        if (bst -> tree[i] > value) {
+        if (bst -> tree[i] == 0) { //insert into empty node
+            bst -> tree[i] = value;
+            return 1; //return success
+            
+        } else if (bst -> tree[i] > value) {
             i = i * 2 + 1; //move to left child
-            insertHeight++;
+            
         } else if (bst -> tree[i] < value) {
             i = i * 2 + 2; //move to right child
-            insertHeight++;
-        } else if (bst -> tree[i] == 0) { //insert into empty node
-            bst -> tree[i] = value;
             
-            if (insertHeight == height) { //if we are inserting at the bottom of tree, add new layer
-                growTree(bst);
-            }
-            
-            return 1; //return success
         } else if (bst -> tree[i] == value) {
             return -1; //indicate that a duplicate was found
+            
         }
-
+        //See if i > size, if so the tree needs to grow to insert. after reset i to move through new tree
+        if (i >= bst -> size) {
+            growTree(bst);
+            i = 0;
+        }
     }
     
     return -1; //indicates that size of tree is 0
