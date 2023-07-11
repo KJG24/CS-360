@@ -162,6 +162,7 @@ int deleteValue(BST *bst, int value) {
         }
         
         bst -> tree[bst -> size - 1] = 0;
+        return valueIndex;
         
     } else if (bst -> tree[rightChild] != 0) {
         bst -> tree[valueIndex] = bst -> tree[rightChild];
@@ -176,5 +177,6 @@ int deleteValue(BST *bst, int value) {
         for (i; i < size - 1; i++) { //fill in the new bottom layer with all zeros
             bst -> tree[i] = 0;
         }
+        return valueIndex;
     }
 }
