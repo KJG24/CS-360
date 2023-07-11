@@ -93,11 +93,88 @@ int insertValue(BST *bst, int value) {
     return -1; //indicates that size of tree is 0
 }
 
+/*
+ The findValue function takes a given tree and an integer value as parameters.
+ It will then search the tree for the specified value, returning the index of the list if found, or -1 if not
+ */
 int findValue(BST *bst, int value) {
-    return 1;
+    int i = 0;
+    
+    while (i <= bst -> size) {
+        if (bst -> tree[i] == value) { //check if value has been found
+            return i;
+            
+        } else if (bst -> tree[i] > value) { //check if value is less than current index, move left
+            i = i * 2 + 1;
+            
+        } else if (bst -> tree[i] < value) { //check if value is greater than current index, move right
+            i = i * 2 + 2;
+            
+        }
+    }
+    
+    return -1; //triggers if value isn't in tree
 }
 
-
+/*
+ The deleteValue function uses a given tree and integer value as parameters.
+ The function will search the tree for the value, if found it will be deleted, if not it will return -1.
+ If the value is found and has no child nodes, the value is deleted from the tree.
+ If the value has one child node it will be replaced with its single child.
+ If the value has two children then the value is deleted and replaced with
+ the initial right childs' leftmost child.
+ Once deletion is complete the index of the deleted node is returned.
+ */
 int deleteValue(BST *bst, int value) {
-    return 1;
+    int valueindex = findValue(bst, value);
+    int i;
+    int newTree[bst -> size];
+    int leftChild = valueIndex * 2 + 1;
+    int rightChild = valueIndex * 2 + 2;
+    
+    if (valueIndex == -1) { //triggers if the value isn't in the tree
+        return -1;
+    }
+    
+    //Case 1: The value to be deleted either has no child nodes or they are set to zero
+    if ((bst -> tree[leftChild] == 0) || (leftChild > bst -> size)) {
+        if ((bst -> tree[rightChild] == 0) || (rightChild > bst -> size)){
+            bst -> tree[valueIndex] = 0;
+            return valueIndex;
+        }
+    }
+    
+    //Note: case 3 should go before case 2 as it will check for two child nodes
+    
+    //Case 2: The value has one child node
+    if (bst -> tree[leftChild] != 0) {
+        /*
+         This algo works by doing the initial replacements and then once the null values of the empty
+         child have been skipped, loop through the rest of the list and place them in the correct spot
+         */
+        bst -> tree[valueIndex] = bst -> tree[leftChild];
+        bst -> tree[leftChild] = bst -> tree[leftChild * 2 + 1];
+        bst -> tree[leftChild + 1] = bst -> tree[leftChild * 2 + 2];
+        int nextValueIndexAfterRight = rightChild * 2 + 3;
+        
+        for (i = leftChild + 2; i < bst -> size - 1; i++) {
+            bst -> tree[i] = bst -> tree[nextValueIndexAfterRight++];
+        }
+        
+        bst -> tree[bst -> size - 1] = 0;
+        
+    } else if (bst -> tree[rightChild] != 0) {
+        bst -> tree[valueIndex] = bst -> tree[rightChild];
+        bst -> tree[leftChild] = bst -> tree[rightChild * 2 + 1];
+        bst -> tree[rightChild] = bst -> tree[rightChild * 2 + 2];
+        int nextValueIndexAfterLeft = (((rightChild * 2) + 2) * 2) + 1;
+        
+        for (i = rightChild + 1; nextValueIndexAfterLeft < bst -> size - 1; i++) {
+            bst -> tree[i] = bst -> tree[nextValueIndexAfterLeft++];
+        }
+        
+        for (i; i < size - 1; i++) { //fill in the new bottom layer with all zeros
+            bst -> tree[i] = 0;
+        }
+    }
 }
