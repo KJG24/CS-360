@@ -126,7 +126,7 @@ int findValue(BST *bst, int value) {
  Once deletion is complete the index of the deleted node is returned.
  */
 int deleteValue(BST *bst, int value) {
-    int valueindex = findValue(bst, value);
+    int valueIndex = findValue(bst, value);
     int i;
     int newTree[bst -> size];
     int leftChild = valueIndex * 2 + 1;
@@ -174,7 +174,7 @@ int deleteValue(BST *bst, int value) {
             bst -> tree[i] = bst -> tree[nextValueIndexAfterLeft++];
         }
         
-        for (i; i < size - 1; i++) { //fill in the new bottom layer with all zeros
+        for (i; i < bst -> size - 1; i++) { //fill in the new bottom layer with all zeros
             bst -> tree[i] = 0;
         }
         return valueIndex;
