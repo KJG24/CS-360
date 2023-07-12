@@ -144,7 +144,24 @@ int deleteValue(BST *bst, int value) {
         }
     }
     
-    //Note: case 3 should go before case 2 as it will check for two child nodes
+
+    //Case 3: The value has two child nodes.
+    if ((bst -> tree[leftChild] != 0) && (leftChild <= bst -> size)) { //check that both nodes exist and are not null
+        if ((bst -> tree[rightChild] != 0) && (rightChild <= bst -> size)) {
+            int successorNode = rightChild;
+            int previousSuccessorNode = successorNode;
+            
+            while ((bst -> tree[successorNode] != 0) && (successorNode <= bst -> size)) { //move through tree until successor is found
+                previousSuccessorNode = successorNode;
+                successorNode = successorNode * 2 + 1; //move to the left child node
+            }
+            
+            int replacementValue = bst -> tree[previousSuccessorNode]; //replacement value to be deleted with the smallest value in subtree
+            deleteValue(bst, bst -> tree[previousSuccessorNode]); //recall function to remove the smallest value in the subtree and balance
+            bst -> tree[valueIndex] = replacementValue;
+            return valueIndex;
+        }
+    }
     
     //Case 2: The value has one child node
     if (bst -> tree[leftChild] != 0) {
