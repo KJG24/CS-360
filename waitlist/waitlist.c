@@ -7,6 +7,7 @@
  and then is added to a queue to be helped. This is implimented via a queue, ie FIFO, using a struct that contains the
  first and last names of an individual and a description of their issue, and an additional struct that holds that persons info
  and points to the person ahead of them in line. This program will be able to add, delete, and find the head or tail of the queue.
+ For this program the head of the queue is the node right after the SENT node, and the tail is the last node in the linked list.
  */
 
 #include <stdio.h>
@@ -20,7 +21,7 @@
  */
 struct node *queueInit() {
     //No need to dynamically allocate memory of an individual as all fields already have specified memory sizes
-    struct individual sentIndividual = malloc(sizeof(struct individual));
+    struct individual sentIndividual;
     struct node *sentNode = malloc(sizeof(struct node));
     
     strcpy(sentIndividual.firstName, "SENTINEL");
@@ -39,7 +40,7 @@ struct node *queueInit() {
  to the existing queue.
  */
 void queueAdd(struct node *queue, char *firstName, char *lastName, char *issue) {
-    struct individual newPerson = malloc(sizeof(struct individual));
+    struct individual newPerson;
     struct node *newNode = malloc(sizeof(struct node));
     struct node *temp = queue; //tracking node
     
@@ -65,7 +66,7 @@ void queueAdd(struct node *queue, char *firstName, char *lastName, char *issue) 
  */
 struct individual queueDelete(struct node* queue) {
     if (queue -> next == NULL) { //check if queue is empty
-        struct individual blank = malloc(sizeof(struct individual));
+        struct individual blank;
         strcpy(blank.firstName, " ");
         strcpy(blank.lastName, " ");
         strcpy(blank.issue, " ");
@@ -80,9 +81,52 @@ struct individual queueDelete(struct node* queue) {
     temp = temp -> next; //new head of queue
     
     /*
-     The following may need to be tweaked as I'm unsure if not freeing the individual struct will cause memory leaks. 
+     The following may need to be tweaked as I'm unsure if not freeing the individual struct will cause memory leaks.
      */
-    struct individual deletedPerson = nodeToBeDeleted.person;
+    struct individual deletedPerson = nodeToBeDeleted -> person;
     free(nodeToBeDeleted);
     return deletedPerson;
+}
+
+/*
+ queueHead usess a pointer to a given queue as its parameter and returns a normal structure of the individual at the head.
+ This function will just return the person at the head of the queue. Note: empty queues will be passed into the function.
+ */
+struct individual queueHead(struct node* queue) {
+    struct node *temp = queue -> next; //get the head of the line
+    struct individual nextInLine = temp -> person;
+    
+    return nextInLine;
+}
+
+/*
+ queueTail usess a pointer to a given queue as its parameter and returns a normal structure of the individual at the tail.
+ This function will just return the person at the tail of the queue. Note: empty queues will be passed into the function.
+ */
+struct individual queueTail(struct node* queue) {
+    struct node *temp = queue;
+    
+    while (temp -> next != NULL) { //move to the tail of the queue
+        temp = temp -> next;
+    }
+    
+    struct individual lastInLine = temp -> person;
+    return lastInLine;
+}
+
+/*
+ queueFree uses a pointer to a queue as its parameter and returns nothing.
+ This function will take a given queue and free each node from memory.
+ */
+void queueFree(struct node* queue) {
+    struct node *temp = queue -> next; //tracking node to stay ahead of nodes to be deleted
+    free(queue);
+    
+    while (temp != NULL) { //move through the queue and delete as you go
+        queue = temp;
+        temp = temp -> next;
+        free(queue);
+    }
+    
+    return;
 }
