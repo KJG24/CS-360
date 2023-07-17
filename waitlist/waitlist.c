@@ -21,7 +21,7 @@
 struct node *queueInit() {
     //No need to dynamically allocate memory of an individual as all fields already have specified memory sizes
     struct individual sentIndividual = malloc(sizeof(struct individual));
-    struct node sentNode = malloc(sizeof(struct node));
+    struct node *sentNode = malloc(sizeof(struct node));
     
     strcpy(sentIndividual.firstName, "SENTINEL");
     strcpy(sentIndividual.lastName, "SENTINEL");
@@ -40,8 +40,8 @@ struct node *queueInit() {
  */
 void queueAdd(struct node *queue, char *firstName, char *lastName, char *issue) {
     struct individual newPerson = malloc(sizeof(struct individual));
-    struct newNode = malloc(sizeof(struct node));
-    struct node temp = queue; //tracking node
+    struct node *newNode = malloc(sizeof(struct node));
+    struct node *temp = queue; //tracking node
     
     strcpy(newPerson.firstName, firstName);
     strcpy(newPerson.lastName, lastName);
@@ -73,6 +73,16 @@ struct individual queueDelete(struct node* queue) {
         return blank;
     }
     
+    struct node *temp = queue; //tracking node
+    temp = temp -> next; //move to head of queue
     
+    struct node *nodeToBeDeleted = temp; //mark the node to be deleted
+    temp = temp -> next; //new head of queue
     
+    /*
+     The following may need to be tweaked as I'm unsure if not freeing the individual struct will cause memory leaks. 
+     */
+    struct individual deletedPerson = nodeToBeDeleted.person;
+    free(nodeToBeDeleted);
+    return deletedPerson;
 }
