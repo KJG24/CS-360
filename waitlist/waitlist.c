@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "waitlist.h"
 
 /*
@@ -31,3 +32,30 @@ struct node *queueInit() {
     
     return sentNode;
 }
+
+/*
+ queueAdd uses a pointer to a given queue, and strings of a persons name and issue as parameters. There is no return value.
+ This function will take the given data and create a new individual, then insert that individual into a new node and add it
+ to the existing queue.
+ */
+void queueAdd(struct node *queue, char *firstName, char *lastName, char *issue) {
+    struct individual newPerson = malloc(sizeof(struct individual));
+    struct newNode = malloc(sizeof(struct node));
+    struct node temp = queue; //tracking node
+    
+    strcpy(newPerson.firstName, firstName);
+    strcpy(newPerson.lastName, lastName);
+    strcpy(newPerson.issue, issue);
+    
+    newNode -> person = newPerson;
+    newNode -> next = NULL;
+    
+    while (temp -> next != NULL) { //find the tail of the queue
+        temp = temp -> next;
+    }
+    
+    temp -> next = newNode; //insert into list
+    return;
+}
+
+
