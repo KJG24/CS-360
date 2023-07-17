@@ -23,9 +23,9 @@ struct node *queueInit() {
     struct individual sentIndividual = malloc(sizeof(struct individual));
     struct node sentNode = malloc(sizeof(struct node));
     
-    sentIndividual.firstName = "SENTINEL";
-    sentIndividual.lastName = "SENTINEL";
-    sentIndividual.issue = "SENTINEL";
+    strcpy(sentIndividual.firstName, "SENTINEL");
+    strcpy(sentIndividual.lastName, "SENTINEL");
+    strcpy(sentIndividual.issue, "SENTINEL");
     
     sentNode -> person = sentIndividual;
     sentNode -> next = NULL;
@@ -58,4 +58,21 @@ void queueAdd(struct node *queue, char *firstName, char *lastName, char *issue) 
     return;
 }
 
-
+/*
+ queueDelete will use a pointer to a given queue as its parameter, and will return the structure of the deleted individual.
+ This function will remove the node at the head of the queue, and shift the rest of the queue accordingly.
+ In the case that the queue is empty and struct of an individual containing all " " will be returned.
+ */
+struct individual queueDelete(struct node* queue) {
+    if (queue -> next == NULL) { //check if queue is empty
+        struct individual blank = malloc(sizeof(struct individual));
+        strcpy(blank.firstName, " ");
+        strcpy(blank.lastName, " ");
+        strcpy(blank.issue, " ");
+        
+        return blank;
+    }
+    
+    
+    
+}
